@@ -1,0 +1,103 @@
+local LocalPlayer = game.Players.LocalPlayer
+local Argument = "MOUSE"
+local MainEvent = nil
+local Character
+
+function GetGame()
+    local game_support = {
+        ["UpdateMousePosI2"] = {
+            2788229376,
+            7213786345,
+            16033173781,
+        },
+        ["MousePos"] = {
+            5602055394,
+            7951883376,
+        },
+        ["MOUSE"] = {
+            125825216602676,
+            15186202290,
+            18111448661,
+            18111451594,
+            16560956150,
+            18198680772,
+            17564718305,
+            17564716597,
+        },
+        ["UpdateMousePos"] = {
+            17897702920,
+            11143225577,
+            86382109024302,
+            17502123056,
+            14174018683,
+            18177028900,
+            18459606288,
+            17721393836,
+            17809101348,
+            16859411452,
+            18129399112,
+            17079102898,
+            17061444544,
+            17344804827,
+            15644861772,
+            18710690149,
+        },
+        ["MoonUpdateMousePos"] = {
+            15166543806,
+        }
+    }
+    return game_support
+end
+
+task.spawn(function()
+    local game_support = GetGame()
+    for Index, Value in pairs(game_support) do 
+        if table.find(Value, game.PlaceId) then 
+            Argument = Index
+            break
+        end
+    end
+
+    for _, Value in pairs(game.ReplicatedStorage:GetChildren()) do
+        if Value.Name == "MainEvent" or Value.Name == "Bullets" or 
+           Value.Name == ".gg/untitledhood" or Value.Name == "Remote" or 
+           Value.Name == "MAINEVENT" then
+            MainEvent = Value
+            break 
+        end
+    end
+end)
+
+local function CharAdded()
+    if Character then
+        Character.ChildAdded:Connect(function(tool)
+            if tool:IsA("Tool") then
+                tool.Activated:Connect(function()
+                    if MainEvent and Argument then
+                        if Justify.Enabled and TargBindEnabled and TargetPlr and TargetPlr.Character and TargetPlr.Character:FindFirstChild(Justify.RealHitPart) then
+                            local AimPosition
+                            if Justify.Resolver then
+                                AimPosition = TargetPlr.Character[Justify.RealHitPart].Position + Vector3.new(0, Justify.RealJumpOffset, 0) + (TargResolvePos * Justify.RealPrediction)
+                            else
+                                AimPosition = TargetPlr.Character[Justify.RealHitPart].Position + Vector3.new(0, Justify.RealJumpOffset, 0) + (TargetPlr.Character[Justify.RealHitPart].AssemblyLinearVelocity * Justify.RealPrediction)
+                            end
+                            MainEvent:FireServer(Argument, AimPosition)
+
+                           
+                        end
+                    end
+                end)
+            end
+        end)
+    end
+end
+
+LocalPlayer.CharacterAdded:Connect(function(newchar)
+    Character = newchar
+    CharAdded()
+end)
+
+if LocalPlayer.Character then
+    Character = LocalPlayer.Character
+    CharAdded()
+end
